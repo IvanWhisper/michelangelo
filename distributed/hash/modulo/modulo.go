@@ -1,6 +1,6 @@
 package modulo
 
-import "michelangelo/log"
+import "github.com/IvanWhisper/michelangelo/log"
 
 // 取模
 type Sharding struct {
