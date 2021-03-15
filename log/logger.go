@@ -102,6 +102,7 @@ func InitLoggerWithWriteSyncer(cfg *Config, output zapcore.WriteSyncer, opts ...
 		Syncer: output,
 		Level:  level,
 	}
+	zap.ReplaceGlobals(lg)
 	return lg, r, nil
 }
 

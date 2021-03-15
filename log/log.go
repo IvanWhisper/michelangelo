@@ -8,6 +8,7 @@ import (
 // Debug logs a message at DebugLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func Debug(msg string, fields ...zap.Field) {
+
 	GetLogger().Debug(msg, fields...)
 }
 
