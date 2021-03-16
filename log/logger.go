@@ -1,11 +1,14 @@
 package log
 
 import (
+	"io"
+	"log"
 	"os"
 	"path"
 	"sync/atomic"
 	"time"
 
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
@@ -57,11 +60,7 @@ func Sync() error {
 func InitLogger(cfg *Config, opts ...zap.Option) (*zap.Logger, *ZapProperties, error) {
 	var output zapcore.WriteSyncer
 	if len(cfg.File.Filename) > 0 {
-		lg, err := initFileLog(&cfg.File)
-		if err != nil {
-			return nil, nil, err
-		}
-		output = zapcore.AddSync(lg)
+		output = zapcore.AddSync(getWriter(&cfg.File))
 	} else {
 		stdOut, _, err := zap.Open([]string{"stdout"}...)
 		if err != nil {
@@ -140,7 +139,7 @@ func initFileLogName(cfg *FileLogConfig) (string, error) {
 	if len(cfg.Filename) > 0 {
 		return path.Join(dir, cfg.Filename), nil
 	} else {
-		return path.Join(dir, time.Now().Format("20060102")), nil
+		return "app", nil
 	}
 }
 
@@ -162,4 +161,21 @@ func initFileLog(cfg *FileLogConfig) (*lumberjack.Logger, error) {
 		LocalTime:  true,
 		Compress:   cfg.Compress,
 	}, nil
+}
+
+func getWriter(cfg *FileLogConfig) io.Writer {
+	// 生成rotatelogs的Logger 实际生成的文件名 demo.log.YYmmddHH
+	// demo.log是指向最新日志的链接
+	filename, _ := initFileLogName(cfg)
+	hook, err := rotatelogs.New(
+		filename+".%Y%m%d%H", // 没有使用go风格反人类的format格式
+		rotatelogs.WithLinkName(filename),
+		rotatelogs.WithMaxAge(time.Hour*24*time.Duration(cfg.MaxDays)), // 保存30天
+		rotatelogs.WithRotationTime(time.Hour*24),                      //切割频率 24小时
+	)
+	if err != nil {
+		log.Println("日志启动异常")
+		panic(err)
+	}
+	return hook
 }
