@@ -105,7 +105,7 @@ func InitLoggerWithWriteSyncer(cfg *Config, output zapcore.WriteSyncer, opts ...
 	ccore := zapcore.NewCore(consoleEncoder, consoleDebugging, consoleLevel)
 
 	cores := zapcore.NewTee(ccore, fcore)
-	lg := zap.New(cores, zap.AddCaller(), zap.AddCallerSkip(1))
+	lg := zap.New(cores, zap.AddCaller(), zap.AddCallerSkip(cfg.CallSkip))
 	r := &ZapProperties{
 		Core:   cores,
 		Syncer: output,

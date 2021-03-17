@@ -16,6 +16,8 @@ type FileLogConfig struct {
 
 // Config serializes log related config in toml/json.
 type Config struct {
+	// Log CallSkip
+	CallSkip     int  `toml:"callSkip" json:"callSkip"`
 	IsProduction bool `toml:"isProduction" json:"isProduction"`
 	// Log level.
 	Level string `toml:"level" json:"level"`
