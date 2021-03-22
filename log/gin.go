@@ -1,8 +1,10 @@
 package log
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"net"
 	"net/http"
@@ -19,10 +21,16 @@ func GinLogger() gin.HandlerFunc {
 		start := time.Now()
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
+		rid := c.GetHeader("X-Request-ID")
+		if rid == "" {
+			rid = uuid.NewString()
+		}
+		ridCtx := context.WithValue(c.Request.Context(), REQUEST_ID_KEY, rid)
+		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
-
 		cost := time.Since(start)
-		GetLogger().Info(path,
+		Info(path,
+			zap.String(REQUEST_ID, rid),
 			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
 			zap.String("path", path),
@@ -54,7 +62,7 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 
 				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
-					GetLogger().Error(c.Request.URL.Path,
+					Error(c.Request.URL.Path,
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),
 					)
@@ -65,13 +73,13 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					GetLogger().Error("[Recovery from panic]",
+					Error("[Recovery from panic]",
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),
 						zap.String("stack", string(debug.Stack())),
 					)
 				} else {
-					GetLogger().Error("[Recovery from panic]",
+					Error("[Recovery from panic]",
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),
 					)
