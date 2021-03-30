@@ -61,7 +61,7 @@ func (l *Level) Unpack(str string) error {
 		}
 	}
 
-	return errors.Errorf("invalid level '%v'", str)
+	return errors.New(fmt.Sprintf("invalid level '%v'", str))
 }
 
 func (l Level) zapLevel() zapcore.Level {
