@@ -11,6 +11,7 @@ import (
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -71,15 +72,14 @@ func InitLogger(cfg *Config, opts ...zap.Option) (*zap.Logger, *ZapProperties, e
 	return InitLoggerWithWriteSyncer(cfg, output, opts...)
 }
 
-// InitLoggerWithWriteSyncer initializes a zap logger with specified  write syncer.
-func InitLoggerWithWriteSyncer(cfg *Config, output zapcore.WriteSyncer, opts ...zap.Option) (*zap.Logger, *ZapProperties, error) {
+func BuildEncoder(format string) zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 	}
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	var encoder zapcore.Encoder
-	switch cfg.Format {
+	switch format {
 	case "console":
 		encoder = zapcore.NewConsoleEncoder(encoderConfig) // 普通模式
 	case "json":
@@ -87,30 +87,29 @@ func InitLoggerWithWriteSyncer(cfg *Config, output zapcore.WriteSyncer, opts ...
 	default:
 		encoder = zapcore.NewConsoleEncoder(encoderConfig) // 普通模式
 	}
+	return encoder
+}
 
-	level := zap.NewAtomicLevel()
-	err := level.UnmarshalText([]byte(cfg.Level))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	fcore := zapcore.NewCore(encoder, output, level)
-
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	consoleLevel := zapcore.ErrorLevel
-	if !cfg.IsProduction {
-		consoleLevel = zapcore.DebugLevel
-	}
-	ccore := zapcore.NewCore(consoleEncoder, consoleDebugging, consoleLevel)
-
+// InitLoggerWithWriteSyncer initializes a zap logger with specified  write syncer.
+func InitLoggerWithWriteSyncer(cfg *Config, output zapcore.WriteSyncer, opts ...zap.Option) (*zap.Logger, *ZapProperties, error) {
+	// get level
+	lv := cfg.GetLevel()
+	stdlv := cfg.GetStdLevel()
+	// build file core
+	f_encoder := BuildEncoder(cfg.Format)
+	fcore := zapcore.NewCore(f_encoder, output, lv.zapLevel())
+	// build consle core
+	c_encoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	ccore := zapcore.NewCore(c_encoder, zapcore.Lock(os.Stdout), stdlv.zapLevel())
 	cores := zapcore.NewTee(ccore, fcore)
+	// build log
 	lg := zap.New(cores, zap.AddCaller(), zap.AddCallerSkip(cfg.CallSkip))
 	r := &ZapProperties{
 		Core:   cores,
 		Syncer: output,
-		Level:  level,
+		Level:  lv,
 	}
+	//  replace Globals log
 	zap.ReplaceGlobals(lg)
 	return lg, r, nil
 }
@@ -164,8 +163,6 @@ func initFileLog(cfg *FileLogConfig) (*lumberjack.Logger, error) {
 }
 
 func getWriter(cfg *FileLogConfig) io.Writer {
-	// 生成rotatelogs的Logger 实际生成的文件名 demo.log.YYmmddHH
-	// demo.log是指向最新日志的链接
 	filename, _ := initFileLogName(cfg)
 	hook, err := rotatelogs.New(
 		filename+".%Y%m%d%H", // 没有使用go风格反人类的format格式
