@@ -15,25 +15,25 @@ func (l *OrmLogger) Debug(v ...interface{}) {
 	zap.L().Debug(Interfaces2String(v))
 }
 func (l *OrmLogger) Debugf(format string, v ...interface{}) {
-	zap.L().Debug(fmt.Sprintf(format, v))
+	zap.L().Debug(fmt.Sprintf(format, v...))
 }
 func (l *OrmLogger) Error(v ...interface{}) {
 	zap.L().Error(Interfaces2String(v))
 }
 func (l *OrmLogger) Errorf(format string, v ...interface{}) {
-	zap.L().Error(fmt.Sprintf(format, v))
+	zap.L().Error(fmt.Sprintf(format, v...))
 }
 func (l *OrmLogger) Info(v ...interface{}) {
 	zap.L().Info(Interfaces2String(v))
 }
 func (l *OrmLogger) Infof(format string, v ...interface{}) {
-	zap.L().Info(fmt.Sprintf(format, v))
+	zap.L().Info(fmt.Sprintf(format, v...))
 }
 func (l *OrmLogger) Warn(v ...interface{}) {
 	zap.L().Warn(Interfaces2String(v))
 }
 func (l *OrmLogger) Warnf(format string, v ...interface{}) {
-	zap.L().Warn(fmt.Sprintf(format, v))
+	zap.L().Warn(fmt.Sprintf(format, v...))
 }
 
 func (l *OrmLogger) Level() xlog.LogLevel {
@@ -58,16 +58,16 @@ func (l *OrmCtxLogger) BeforeSQL(context xlog.LogContext) {}
 func (l *OrmCtxLogger) AfterSQL(context xlog.LogContext)  {}
 
 func (l *OrmCtxLogger) Debugf(format string, v ...interface{}) {
-	zap.L().Debug(fmt.Sprintf(format, v))
+	zap.L().Debug(fmt.Sprintf(format, v...))
 }
 func (l *OrmCtxLogger) Errorf(format string, v ...interface{}) {
-	zap.L().Error(fmt.Sprintf(format, v))
+	zap.L().Error(fmt.Sprintf(format, v...))
 }
 func (l *OrmCtxLogger) Infof(format string, v ...interface{}) {
-	zap.L().Info(fmt.Sprintf(format, v))
+	zap.L().Info(fmt.Sprintf(format, v...))
 }
 func (l *OrmCtxLogger) Warnf(format string, v ...interface{}) {
-	zap.L().Warn(fmt.Sprintf(format, v))
+	zap.L().Warn(fmt.Sprintf(format, v...))
 }
 
 func (l *OrmCtxLogger) Level() xlog.LogLevel {

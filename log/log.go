@@ -8,13 +8,13 @@ import (
 // Debug logs a message at DebugLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func Debug(msg string, fields ...zap.Field) {
-	if GetLevel().Enabled(DebugLevel) {
+	if GetLevel().Unabled(DebugLevel) {
 		return
 	}
 	GetLogger().Debug(msg, fields...)
 }
 func DebugCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Enabled(DebugLevel) {
+	if GetLevel().Unabled(DebugLevel) {
 		return
 	}
 	fs := PickRequestId(ctx, fields)
@@ -24,13 +24,13 @@ func DebugCtx(msg string, ctx context.Context, fields ...zap.Field) {
 // Info logs a message at InfoLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func Info(msg string, fields ...zap.Field) {
-	if GetLevel().Enabled(InfoLevel) {
+	if GetLevel().Unabled(InfoLevel) {
 		return
 	}
 	GetLogger().Info(msg, fields...)
 }
 func InfoCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Enabled(InfoLevel) {
+	if GetLevel().Unabled(InfoLevel) {
 		return
 	}
 	fs := PickRequestId(ctx, fields)
@@ -40,13 +40,13 @@ func InfoCtx(msg string, ctx context.Context, fields ...zap.Field) {
 // Warn logs a message at WarnLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func Warn(msg string, fields ...zap.Field) {
-	if GetLevel().Enabled(WarnLevel) {
+	if GetLevel().Unabled(WarnLevel) {
 		return
 	}
 	GetLogger().Warn(msg, fields...)
 }
 func WarnCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Enabled(WarnLevel) {
+	if GetLevel().Unabled(WarnLevel) {
 		return
 	}
 	fs := PickRequestId(ctx, fields)
@@ -56,13 +56,13 @@ func WarnCtx(msg string, ctx context.Context, fields ...zap.Field) {
 // Error logs a message at ErrorLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func Error(msg string, fields ...zap.Field) {
-	if GetLevel().Enabled(ErrorLevel) {
+	if GetLevel().Unabled(ErrorLevel) {
 		return
 	}
 	GetLogger().Error(msg, fields...)
 }
 func ErrorCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Enabled(ErrorLevel) {
+	if GetLevel().Unabled(ErrorLevel) {
 		return
 	}
 	fs := PickRequestId(ctx, fields)
@@ -74,13 +74,13 @@ func ErrorCtx(msg string, ctx context.Context, fields ...zap.Field) {
 //
 // The logger then panics, even if logging at PanicLevel is disabled.
 func Panic(msg string, fields ...zap.Field) {
-	if GetLevel().Enabled(CriticalLevel) {
+	if GetLevel().Unabled(CriticalLevel) {
 		return
 	}
 	GetLogger().Panic(msg, fields...)
 }
 func PanicCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Enabled(CriticalLevel) {
+	if GetLevel().Unabled(CriticalLevel) {
 		return
 	}
 	fs := PickRequestId(ctx, fields)
@@ -93,14 +93,14 @@ func PanicCtx(msg string, ctx context.Context, fields ...zap.Field) {
 // The logger then calls os.Exit(1), even if logging at FatalLevel is
 // disabled.
 func Fatal(msg string, fields ...zap.Field) {
-	if GetLevel().Enabled(CriticalLevel) {
+	if GetLevel().Unabled(CriticalLevel) {
 		return
 	}
 	GetLogger().Fatal(msg, fields...)
 }
 
 func FatalCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Enabled(CriticalLevel) {
+	if GetLevel().Unabled(CriticalLevel) {
 		return
 	}
 	fs := PickRequestId(ctx, fields)

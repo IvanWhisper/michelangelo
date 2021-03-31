@@ -45,9 +45,9 @@ func (l Level) String() string {
 	return fmt.Sprintf("Level(%d)", l)
 }
 
-// Enabled returns true if given level is enabled.
-func (l Level) Enabled(level Level) bool {
-	return level >= l
+// Unabled returns true if given level is enabled.
+func (l Level) Unabled(level Level) bool {
+	return level < l
 }
 
 // Unpack unmarshals a level string to a Level. This implements
