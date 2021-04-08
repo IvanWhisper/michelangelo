@@ -108,8 +108,10 @@ func FatalCtx(msg string, ctx context.Context, fields ...zap.Field) {
 }
 
 func PickRequestId(ctx context.Context, fields []zap.Field) []zap.Field {
-	rid := ctx.Value(REQUEST_ID_KEY).(string)
-	fields = append(fields, zap.String(REQUEST_ID, rid))
+	if ctx != nil {
+		rid := ctx.Value(REQUEST_ID_KEY).(string)
+		fields = append(fields, zap.String(REQUEST_ID, rid))
+	}
 	return fields
 }
 
