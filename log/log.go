@@ -107,6 +107,20 @@ func FatalCtx(msg string, ctx context.Context, fields ...zap.Field) {
 	GetLogger().Fatal(msg, fs...)
 }
 
+//func dispatcher(ctx context.Context,level Level,recordFunc func(msg string, fields ...zap.Field)) func(msg string, fields ...zap.Field){
+//	return func(msg string, fields ...zap.Field){
+//		if GetLevel().Unabled(level) {
+//			return
+//		}
+//		fs := PickRequestId(ctx, fields)
+//		if recordFunc!=nil{
+//			recordFunc(msg,fs...)
+//		}else{
+//
+//		}
+//	}
+//}
+
 func PickRequestId(ctx context.Context, fields []zap.Field) []zap.Field {
 	if ctx != nil {
 		if v := ctx.Value(REQUEST_ID_KEY); v != nil {

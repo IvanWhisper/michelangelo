@@ -93,15 +93,24 @@ func BuildEncoder(format string) zapcore.Encoder {
 // InitLoggerWithWriteSyncer initializes a zap logger with specified  write syncer.
 func InitLoggerWithWriteSyncer(cfg *Config, output zapcore.WriteSyncer, opts ...zap.Option) (*zap.Logger, *ZapProperties, error) {
 	// get level
-	lv := cfg.GetLevel()
-	stdlv := cfg.GetStdLevel()
-	// build file core
-	f_encoder := BuildEncoder(cfg.Format)
-	fcore := zapcore.NewCore(f_encoder, output, lv.zapLevel())
-	// build consle core
+	def := DebugLevel
+	lv := &def
+	stdlv := &def
+
+	coretree := make([]zapcore.Core, 0)
+
+	if cfg != nil {
+		lv := cfg.GetLevel()
+		stdlv = cfg.GetStdLevel()
+		// build file core
+		f_encoder := BuildEncoder(cfg.Format)
+		coretree = append(coretree, zapcore.NewCore(f_encoder, output, lv.zapLevel()))
+	}
+
 	c_encoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	ccore := zapcore.NewCore(c_encoder, zapcore.Lock(os.Stdout), stdlv.zapLevel())
-	cores := zapcore.NewTee(ccore, fcore)
+	coretree = append(coretree, zapcore.NewCore(c_encoder, zapcore.Lock(os.Stdout), stdlv.zapLevel()))
+	cores := zapcore.NewTee(coretree...)
+
 	// build log
 	lg := zap.New(cores, zap.AddCaller(), zap.AddCallerSkip(cfg.CallSkip))
 	r := &ZapProperties{
