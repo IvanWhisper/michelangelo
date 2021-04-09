@@ -27,3 +27,11 @@ func TestUpdateLevel(t *testing.T) {
 	Info("info")
 	Error("error")
 }
+
+func TestNoCfg(t *testing.T) {
+	New(nil)
+	log.Print(GetLevel())
+	Debug("debug")
+	Info("info")
+	Error("error")
+}
