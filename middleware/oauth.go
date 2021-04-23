@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func OAuth(authurl, clientid, secret string,getToken func(resp []byte) (interface{},error)) gin.HandlerFunc {
+func OAuth(authurl, clientid, secret string, getToken func(resp []byte) (interface{}, error)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// catch a bear token
 		bearToken := c.Request.Header.Get("Authorization")
@@ -35,12 +35,13 @@ func OAuth(authurl, clientid, secret string,getToken func(resp []byte) (interfac
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		tk,err:=getToken(bytes)
+		tk, err := getToken(bytes)
 		if err != nil {
-			mlog.Error("token unknow"+err.Error())
+			mlog.Error("token unknow" + err.Error())
 		} else {
-			newCtx:=context.WithValue(c.Request.Context(),"tokeninfo",tk)
-			c.Request=c.Request.WithContext(newCtx)
+			newTkCtx := context.WithValue(c.Request.Context(), "token", token)
+			newCtx := context.WithValue(newTkCtx, "tokeninfo", tk)
+			c.Request = c.Request.WithContext(newCtx)
 		}
 		c.Next()
 	}
