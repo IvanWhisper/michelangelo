@@ -29,7 +29,7 @@ func GinLogger() gin.HandlerFunc {
 		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
 		cost := time.Since(start)
-		Info(path,
+		Debug(path,
 			zap.String(REQUEST_ID, rid),
 			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
