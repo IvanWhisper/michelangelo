@@ -79,7 +79,7 @@ func BuildEncoder(format string) zapcore.Encoder {
 		NameKey:        "logger",
 		CallerKey:      "caller",
 		FunctionKey:    zapcore.OmitKey,
-		MessageKey:     "message",
+		MessageKey:     "msg",
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,

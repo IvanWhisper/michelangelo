@@ -29,7 +29,7 @@ const (
 	K_UserAgent    = "userAgent"
 	K_Errors       = "errors"
 
-	K_Message = "message"
+	K_Message = "msg"
 
 	K_Keyword = "keyword"
 
