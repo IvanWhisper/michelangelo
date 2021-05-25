@@ -29,16 +29,16 @@ func GinLogger() gin.HandlerFunc {
 		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
 		cost := time.Since(start)
-		Debug(path,
-			zap.String(REQUEST_ID, rid),
-			zap.Int("status", c.Writer.Status()),
-			zap.String("method", c.Request.Method),
-			zap.String("path", path),
-			zap.String("query", query),
-			zap.String("ip", c.ClientIP()),
-			zap.String("user-agent", c.Request.UserAgent()),
-			zap.String("errors", c.Errors.ByType(gin.ErrorTypePrivate).String()),
-			zap.Duration("cost", cost),
+		Info(path,
+			zap.String(K_SessionId, rid),
+			zap.Int(K_StatusCode, c.Writer.Status()),
+			zap.String(K_HttpMethod, c.Request.Method),
+			zap.String(K_HttpPath, path),
+			zap.String(K_Query, query),
+			zap.String(K_ClientIp, c.ClientIP()),
+			zap.String(K_UserAgent, c.Request.UserAgent()),
+			zap.String(K_Errors, c.Errors.ByType(gin.ErrorTypePrivate).String()),
+			zap.Duration(K_Duration, cost),
 		)
 	}
 }
@@ -63,8 +63,8 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
 					Error(c.Request.URL.Path,
-						zap.Any("error", err),
-						zap.String("request", string(httpRequest)),
+						zap.Any(K_Errors, err),
+						zap.String(K_HttpRequest, string(httpRequest)),
 					)
 					// If the connection is dead, we can't write a status to it.
 					c.Error(err.(error)) // nolint: errcheck
@@ -74,14 +74,14 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 
 				if stack {
 					Error("[Recovery from panic]",
-						zap.Any("error", err),
-						zap.String("request", string(httpRequest)),
+						zap.Any(K_Errors, err),
+						zap.String(K_HttpRequest, string(httpRequest)),
 						zap.String("stack", string(debug.Stack())),
 					)
 				} else {
 					Error("[Recovery from panic]",
-						zap.Any("error", err),
-						zap.String("request", string(httpRequest)),
+						zap.Any(K_Errors, err),
+						zap.String(K_HttpRequest, string(httpRequest)),
 					)
 				}
 				c.AbortWithStatus(http.StatusInternalServerError)
