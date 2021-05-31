@@ -50,6 +50,77 @@ func (l *OrmLogger) IsShowSQL() bool {
 	return true
 }
 
+var (
+	SessionIDKey      = "__xorm_session_id"
+	SessionKey        = "__xorm_session_key"
+	SessionShowSQLKey = "__xorm_show_sql"
+)
+
+type OrmLoggerAdapter struct {
+	level xlog.LogLevel
+}
+
+func NewOrmLoggerAdapter() xlog.ContextLogger {
+	return &OrmLoggerAdapter{}
+}
+
+// BeforeSQL implements ContextLogger
+func (l *OrmLoggerAdapter) BeforeSQL(ctx xlog.LogContext) {}
+
+// AfterSQL implements ContextLogger
+func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
+	var sessionPart string
+	v := ctx.Ctx.Value(SessionIDKey)
+	if key, ok := v.(string); ok {
+		sessionPart = fmt.Sprintf(" [%s]", key)
+	}
+	if ctx.ExecuteTime > 0 {
+		InfoCtx(fmt.Sprintf("[SQL]%s %s %v - %v", sessionPart, ctx.SQL, ctx.Args, ctx.ExecuteTime), ctx.Ctx)
+	} else {
+		InfoCtx(fmt.Sprintf("[SQL]%s %s %v", sessionPart, ctx.SQL, ctx.Args), ctx.Ctx)
+	}
+}
+
+// Debugf implements ContextLogger
+func (l *OrmLoggerAdapter) Debugf(format string, v ...interface{}) {
+	zap.L().Debug(fmt.Sprintf(format, v...))
+}
+
+// Errorf implements ContextLogger
+func (l *OrmLoggerAdapter) Errorf(format string, v ...interface{}) {
+	zap.L().Error(fmt.Sprintf(format, v...))
+}
+
+// Infof implements ContextLogger
+func (l *OrmLoggerAdapter) Infof(format string, v ...interface{}) {
+	zap.L().Info(fmt.Sprintf(format, v...))
+}
+
+// Warnf implements ContextLogger
+func (l *OrmLoggerAdapter) Warnf(format string, v ...interface{}) {
+	zap.L().Warn(fmt.Sprintf(format, v...))
+}
+
+// Level implements ContextLogger
+func (l *OrmLoggerAdapter) Level() xlog.LogLevel {
+	return l.level
+}
+
+// SetLevel implements ContextLogger
+func (l *OrmLoggerAdapter) SetLevel(lv xlog.LogLevel) {
+	l.level = lv
+}
+
+// ShowSQL implements ContextLogger
+func (l *OrmLoggerAdapter) ShowSQL(show ...bool) {
+
+}
+
+// IsShowSQL implements ContextLogger
+func (l *OrmLoggerAdapter) IsShowSQL() bool {
+	return true
+}
+
 type OrmCtxLogger struct {
 	level xlog.LogLevel
 }
