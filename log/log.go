@@ -128,6 +128,10 @@ func PickRequestId(ctx context.Context, fields []zap.Field) []zap.Field {
 			fields = append(fields, zap.String(K_SessionId, rid))
 			fields = append(fields, zap.String(K_TraceId, rid))
 		}
+		if v := ctx.Value(K_Keyword); v != nil {
+			kw := v.(string)
+			fields = append(fields, zap.String(K_Keyword, kw))
+		}
 	}
 	return fields
 }
