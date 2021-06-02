@@ -128,9 +128,17 @@ func PickRequestId(ctx context.Context, fields []zap.Field) []zap.Field {
 			fields = append(fields, zap.String(K_SessionId, rid))
 			fields = append(fields, zap.String(K_TraceId, rid))
 		}
-		if v := ctx.Value(K_Keyword); v != nil {
+		if v := ctx.Value(K_BusinessKeyword); v != nil {
 			kw := v.(string)
-			fields = append(fields, zap.String(K_Keyword, kw))
+			fields = append(fields, zap.String(K_BusinessKeyword, kw))
+		}
+		if v := ctx.Value(K_BusinessOperation); v != nil {
+			kw := v.(string)
+			fields = append(fields, zap.String(K_BusinessOperation, kw))
+		}
+		if v := ctx.Value(K_BusinessTitle); v != nil {
+			kw := v.(string)
+			fields = append(fields, zap.String(K_BusinessTitle, kw))
 		}
 	}
 	return fields

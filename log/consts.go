@@ -31,7 +31,9 @@ const (
 
 	K_Message = "msg"
 
-	K_Keyword = "keyword"
+	K_BusinessKeyword   = "businessKeyword"
+	K_BusinessTitle     = "businessTitle"
+	K_BusinessOperation = "businessOperation"
 
 	K_Datetime = "datetime"
 	K_Caller   = "caller"

@@ -74,6 +74,7 @@ func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
 	if key, ok := v.(string); ok {
 		sessionPart = fmt.Sprintf(" [%s]", key)
 	}
+
 	if ctx.ExecuteTime > 0 {
 		InfoCtx(fmt.Sprintf("[SQL]%s %s %v - %v", sessionPart, ctx.SQL, ctx.Args, ctx.ExecuteTime), ctx.Ctx)
 	} else {
