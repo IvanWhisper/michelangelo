@@ -6,7 +6,6 @@ import (
 	mlog "github.com/IvanWhisper/michelangelo/log"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -34,8 +33,6 @@ func (s *Server) Start() {
 
 	errCh := make(chan error, 1)
 	defer close(errCh)
-	quitCh := make(chan os.Signal, 1)
-	defer close(quitCh)
 	// listen
 	go func() {
 		// service connections
@@ -44,13 +41,15 @@ func (s *Server) Start() {
 		}
 	}()
 
-	signal.Notify(quitCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
 	select {
-	case s := <-quitCh:
-		mlog.Info(fmt.Sprintf("Shutdown: Receive Sign(%s)", s.String()))
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	case s := <-ctx.Done():
+		stop()
+		mlog.Info(fmt.Sprintf("Shutdown: Receive Sign(%s)", s))
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		if err := srv.Shutdown(ctx); err != nil {
+		if err := srv.Shutdown(timeoutCtx); err != nil {
 			mlog.Error(fmt.Sprintf("Shutdown: %s", err.Error()))
 		}
 		mlog.Info("Shutdown: exit")
