@@ -74,11 +74,17 @@ func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
 	if key, ok := v.(string); ok {
 		sessionPart = fmt.Sprintf(" [%s]", key)
 	}
-
-	if ctx.ExecuteTime > 0 {
-		InfoCtx(fmt.Sprintf("[SQL]%s %s %v - %v", sessionPart, ctx.SQL, ctx.Args, ctx.ExecuteTime), ctx.Ctx)
+	if ctx.Err != nil {
+		ErrorCtx(fmt.Sprintf("[SQL]%s %s %v", sessionPart, ctx.SQL, ctx.Args), ctx.Ctx)
 	} else {
-		InfoCtx(fmt.Sprintf("[SQL]%s %s %v", sessionPart, ctx.SQL, ctx.Args), ctx.Ctx)
+		if len(ctx.Args) > 100 {
+			if ctx.Result != nil {
+				rows, err := ctx.Result.RowsAffected()
+				InfoCtx(fmt.Sprintf("[SQL]%s Row %d Err %s - %v", sessionPart, rows, err, ctx.ExecuteTime), ctx.Ctx)
+			}
+		} else {
+			InfoCtx(fmt.Sprintf("[SQL]%s %s %v - %v", sessionPart, ctx.SQL, ctx.Args, ctx.ExecuteTime), ctx.Ctx)
+		}
 	}
 }
 
