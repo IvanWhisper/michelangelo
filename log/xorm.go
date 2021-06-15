@@ -77,7 +77,7 @@ func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
 	if ctx.Err != nil {
 		ErrorCtx(fmt.Sprintf("[SQL]%s %s %v", sessionPart, ctx.SQL, ctx.Args), ctx.Ctx)
 	} else {
-		if len(ctx.Args) > 100 {
+		if len(ctx.Args) > 100 || len(ctx.SQL) > 500 {
 			if ctx.Result != nil {
 				rows, err := ctx.Result.RowsAffected()
 				InfoCtx(fmt.Sprintf("[SQL]%s Row %d Err %s - %v", sessionPart, rows, err, ctx.ExecuteTime), ctx.Ctx)
