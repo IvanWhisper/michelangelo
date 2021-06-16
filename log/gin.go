@@ -25,7 +25,7 @@ func GinLogger() gin.HandlerFunc {
 		if rid == "" {
 			rid = uuid.NewString()
 		}
-		ridCtx := context.WithValue(c.Request.Context(), REQUEST_ID_KEY, rid)
+		ridCtx := context.WithValue(c.Request.Context(), REQUEST_ID_KEY, rid) // session id
 		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
 		cost := time.Since(start)
