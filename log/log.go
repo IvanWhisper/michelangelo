@@ -107,19 +107,28 @@ func FatalCtx(msg string, ctx context.Context, fields ...zap.Field) {
 	GetLogger().Fatal(msg, fs...)
 }
 
-//func dispatcher(ctx context.Context,level Level,recordFunc func(msg string, fields ...zap.Field)) func(msg string, fields ...zap.Field){
-//	return func(msg string, fields ...zap.Field){
-//		if GetLevel().Unabled(level) {
-//			return
-//		}
-//		fs := PickRequestId(ctx, fields)
-//		if recordFunc!=nil{
-//			recordFunc(msg,fs...)
-//		}else{
-//
-//		}
-//	}
-//}
+func FieldsFrmCtx(ctx context.Context, fields ...zap.Field) []zap.Field {
+	if ctx != nil {
+		if v := ctx.Value(REQUEST_ID_KEY); v != nil {
+			rid := v.(string)
+			fields = append(fields, zap.String(K_SessionId, rid))
+			fields = append(fields, zap.String(K_TraceId, rid))
+		}
+		if v := ctx.Value(K_BusinessKeyword); v != nil {
+			kw := v.(string)
+			fields = append(fields, zap.String(K_BusinessKeyword, kw))
+		}
+		if v := ctx.Value(K_BusinessOperation); v != nil {
+			kw := v.(string)
+			fields = append(fields, zap.String(K_BusinessOperation, kw))
+		}
+		if v := ctx.Value(K_BusinessTitle); v != nil {
+			kw := v.(string)
+			fields = append(fields, zap.String(K_BusinessTitle, kw))
+		}
+	}
+	return fields
+}
 
 func PickRequestId(ctx context.Context, fields []zap.Field) []zap.Field {
 	if ctx != nil {

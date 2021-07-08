@@ -29,7 +29,7 @@ func GinLogger() gin.HandlerFunc {
 		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
 		cost := time.Since(start)
-		Info(path,
+		GetLogger().Info(path,
 			zap.String(K_SessionId, rid),
 			zap.Int(K_StatusCode, c.Writer.Status()),
 			zap.String(K_HttpMethod, c.Request.Method),
@@ -62,10 +62,7 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 
 				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
-					Error(c.Request.URL.Path,
-						zap.Any(K_Errors, err),
-						zap.String(K_HttpRequest, string(httpRequest)),
-					)
+					GetLogger().Error(c.Request.URL.Path, zap.Any(K_Errors, err), zap.String(K_HttpRequest, string(httpRequest)))
 					// If the connection is dead, we can't write a status to it.
 					c.Error(err.(error)) // nolint: errcheck
 					c.Abort()
@@ -73,16 +70,9 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					Error("[Recovery from panic]",
-						zap.Any(K_Errors, err),
-						zap.String(K_HttpRequest, string(httpRequest)),
-						zap.String("stack", string(debug.Stack())),
-					)
+					GetLogger().Error("Recovery from panic", zap.Any(K_Errors, err), zap.String(K_HttpRequest, string(httpRequest)), zap.String("stack", string(debug.Stack())))
 				} else {
-					Error("[Recovery from panic]",
-						zap.Any(K_Errors, err),
-						zap.String(K_HttpRequest, string(httpRequest)),
-					)
+					GetLogger().Error("Recovery from panic", zap.Any(K_Errors, err), zap.String(K_HttpRequest, string(httpRequest)))
 				}
 				c.AbortWithStatus(http.StatusInternalServerError)
 			}
