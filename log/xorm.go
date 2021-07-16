@@ -74,17 +74,28 @@ func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
 	if key, ok := v.(string); ok {
 		sessionPart = fmt.Sprintf(" [%s]", key)
 	}
+	fields := FieldsFrmCtx(ctx.Ctx, zap.String(K_LogCategory, "SQL"))
+	fields = append(fields, zap.Duration(K_Duration, ctx.ExecuteTime))
+
+	if len(ctx.SQL) < 1024 {
+		fields = append(fields, zap.String(K_Query, ctx.SQL))
+	}
+	args := make([]interface{}, 0)
+	if len(ctx.Args) < 100 {
+		args = ctx.Args
+	}
+	var rows int64
+	var rowErr error
+	if ctx.Result != nil {
+		rows, rowErr = ctx.Result.RowsAffected()
+	}
+	msg := fmt.Sprintf("[SQL]Part: %s Args: %v Rows %d Err %s", sessionPart, args, rows, rowErr)
+	// errors
 	if ctx.Err != nil {
-		GetLogger().Error(fmt.Sprintf("%s %s %v", sessionPart, ctx.SQL, ctx.Args), FieldsFrmCtx(ctx.Ctx, zap.String(K_LogCategory, "SQL"))...)
+		fields = append(fields, zap.String(K_Errors, ctx.Err.Error()))
+		GetLogger().Error(msg, fields...)
 	} else {
-		if len(ctx.Args) > 100 || len(ctx.SQL) > 500 {
-			if ctx.Result != nil {
-				rows, err := ctx.Result.RowsAffected()
-				GetLogger().Info(fmt.Sprintf("%s Rows %d Err %s", sessionPart, rows, err), FieldsFrmCtx(ctx.Ctx, zap.Duration(K_Duration, ctx.ExecuteTime), zap.String(K_LogCategory, "SQL"))...)
-			}
-		} else {
-			GetLogger().Info(fmt.Sprintf("%s %s %v", sessionPart, ctx.SQL, ctx.Args), FieldsFrmCtx(ctx.Ctx, zap.Duration(K_Duration, ctx.ExecuteTime), zap.String(K_LogCategory, "SQL"))...)
-		}
+		GetLogger().Info(msg, fields...)
 	}
 }
 
