@@ -106,7 +106,7 @@ func (a *application) Run(args ...string) error {
 	}()
 	select {
 	case <-timeoutCtx.Done():
-		return errors.New(fmt.Sprintf("PID[%d]%s Exec %v timeOut %d", app.Process.Pid, a.name, args, a.timeOut))
+		return errors.New(fmt.Sprintf("PID[%d]%s Exec %v timeOut %fs", app.Process.Pid, a.GetName(), args, a.GetTimeOut().Seconds()))
 	case c := <-completedCh:
 		if c.Success {
 			return nil
