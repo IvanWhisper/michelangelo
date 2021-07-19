@@ -83,9 +83,10 @@ func (a *application) GetContext() context.Context {
 }
 
 func (a *application) Run(args ...string) error {
-	timeoutCtx, cancel := context.WithTimeout(a.GetContext(), 2*time.Minute)
+	timeoutCtx, cancel := context.WithTimeout(a.GetContext(), a.GetTimeOut())
 	defer cancel()
 	app := exec.CommandContext(timeoutCtx, a.cmd, args...)
+	app.Dir = a.GetWorkPath()
 	app.Stdout = os.Stdout
 	app.Stderr = os.Stderr
 	if err := app.Start(); err != nil {
