@@ -1,6 +1,8 @@
 package log
 
 const (
+	DEBUG_REQUEST_ID = "DebugRequestId"
+
 	REQUEST_ID_KEY = "rid"
 	REQUEST_ID     = "request-id"
 

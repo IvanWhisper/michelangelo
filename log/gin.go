@@ -21,10 +21,18 @@ func GinLogger() gin.HandlerFunc {
 		start := time.Now()
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
+
 		rid := c.GetHeader("X-Request-ID")
+
+		// 用户链路调试
+		if debugId := c.GetHeader(DEBUG_REQUEST_ID); debugId != "" {
+			rid = debugId
+		}
+
 		if rid == "" {
 			rid = uuid.NewString()
 		}
+
 		ridCtx := context.WithValue(c.Request.Context(), REQUEST_ID_KEY, rid) // session id
 		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
