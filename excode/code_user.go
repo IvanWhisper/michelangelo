@@ -6,6 +6,8 @@ const (
 	UserRoleNoFound  ExCode = 2002
 	UserLoginFailed  ExCode = 2003
 	UserLogoutFailed ExCode = 2004
+	UserHasNoFound   ExCode = 2005
+	UserPwdError     ExCode = 2006
 
 	UserCreateErr        ExCode = 2100 // 创建用户时，失败
 	UserRoleCreateFailed ExCode = 2101 // 创建用户时，角色分配失败
