@@ -97,7 +97,7 @@ func (a *application) Run(args ...string) error {
 	go func() {
 		defer close(completedCh)
 		if err := app.Wait(); err != nil {
-			mlog.ErrorCtx(fmt.Sprintf("PID[%d]%s Exec %s %v", app.Process.Pid, a.name, a.cmd, args), a.GetContext())
+			mlog.ErrorCtx(fmt.Sprintf("PID[%d]%s Exec %s %v %s", app.Process.Pid, a.name, a.cmd, args, err), a.GetContext())
 			completedCh <- CompleteResult{Success: false, Error: err}
 			return
 		}
