@@ -93,12 +93,11 @@ func (a *application) Run(args ...string) error {
 		return err
 	}
 	defer app.Process.Kill()
-	mlog.InfoCtx(fmt.Sprintf("PID[%d]%s Exec %v", app.Process.Pid, a.name, args), a.GetContext())
 	completedCh := make(chan CompleteResult, 0)
 	go func() {
 		defer close(completedCh)
 		if err := app.Wait(); err != nil {
-			mlog.ErrorCtx(fmt.Sprintf("PID[%d]%s Exec %v Error %s", app.Process.Pid, a.name, args, err), a.GetContext())
+			mlog.ErrorCtx(fmt.Sprintf("PID[%d]%s Exec %s %v", app.Process.Pid, a.name, a.cmd, args), a.GetContext())
 			completedCh <- CompleteResult{Success: false, Error: err}
 			return
 		}
