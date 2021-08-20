@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -15,7 +16,11 @@ import (
 	"time"
 )
 
-// GinLogger 接收gin框架默认的日志
+// GinLogger
+/**
+ * @Description:
+ * @return gin.HandlerFunc
+ */
 func GinLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -25,15 +30,15 @@ func GinLogger() gin.HandlerFunc {
 		rid := c.GetHeader("X-Request-ID")
 
 		// 用户链路调试
-		if debugId := c.GetHeader(DEBUG_REQUEST_ID); debugId != "" {
-			rid = debugId
+		if debugID := c.GetHeader(DEBUG_REQUEST_ID); debugID != "" {
+			rid = debugID
 		}
 
 		if rid == "" {
 			rid = uuid.NewString()
 		}
 
-		ridCtx := context.WithValue(c.Request.Context(), REQUEST_ID_KEY, rid) // session id
+		var ridCtx = context.WithValue(c.Request.Context(), REQUEST_ID_KEY, rid) // session id
 		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
 		cost := time.Since(start)
@@ -51,7 +56,12 @@ func GinLogger() gin.HandlerFunc {
 	}
 }
 
-// GinRecovery recover掉项目可能出现的panic，并使用zap记录相关日志
+// GinRecovery
+/**
+ * @Description:
+ * @param stack
+ * @return gin.HandlerFunc
+ */
 func GinRecovery(stack bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
@@ -61,7 +71,8 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				fmt.Println(err)
 				var brokenPipe bool
 				if ne, ok := err.(*net.OpError); ok {
-					if se, ok := ne.Err.(*os.SyscallError); ok {
+					var se *os.SyscallError
+					if ok := errors.Is(ne.Err, se); ok {
 						if strings.Contains(strings.ToLower(se.Error()), "broken pipe") || strings.Contains(strings.ToLower(se.Error()), "connection reset by peer") {
 							brokenPipe = true
 						}
@@ -72,7 +83,7 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				if brokenPipe {
 					GetLogger().Sugar().Error(c.Request.URL.Path, zap.Any(K_Errors, err), zap.String(K_HttpRequest, string(httpRequest)))
 					// If the connection is dead, we can't write a status to it.
-					c.Error(err.(error)) // nolint: errcheck
+					c.Error(err.(error)) // nolint: error check
 					c.Abort()
 					return
 				}

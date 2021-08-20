@@ -8,7 +8,7 @@ import (
 func TestUpdateLevel(t *testing.T) {
 	f := FileLogConfig{
 		FileDir:    "./logs",
-		Filename:   "test",
+		FileName:   "test",
 		MaxSize:    10,
 		MaxDays:    1,
 		MaxBackups: 10,
@@ -25,6 +25,7 @@ func TestUpdateLevel(t *testing.T) {
 	log.Print(GetLevel())
 	Debug("debug")
 	Info("info")
+	Warn("warn")
 	Error("error")
 }
 

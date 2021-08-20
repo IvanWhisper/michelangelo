@@ -74,8 +74,8 @@ func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
 	if key, ok := v.(string); ok {
 		sessionPart = fmt.Sprintf(" [%s]", key)
 	}
-	fields := FieldsFrmCtx(ctx.Ctx, zap.String(K_LogCategory, "SQL"))
-	fields = append(fields, zap.Duration(K_Duration, ctx.ExecuteTime))
+	fields := Ctx2Fields(ctx.Ctx)
+	fields = append(fields, zap.String(K_LogCategory, "SQL"), zap.Duration(K_Duration, ctx.ExecuteTime))
 
 	if len(ctx.SQL) > 2048 {
 		fields = append(fields, zap.String(K_Query, ctx.SQL[0:2048]))

@@ -5,109 +5,148 @@ import (
 	"go.uber.org/zap"
 )
 
-// Debug logs a message at DebugLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
+// Debug
+/**
+ * @Description:
+ * @param msg
+ * @param fields
+ */
 func Debug(msg string, fields ...zap.Field) {
-	if GetLevel().Unabled(DebugLevel) {
-		return
-	}
-	GetLogger().Debug(msg, fields...)
-}
-func DebugCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Unabled(DebugLevel) {
-		return
-	}
-	fs := PickRequestId(ctx, fields)
-	GetLogger().Debug(msg, fs...)
+	DebugCtx(nil, msg, fields...)
 }
 
-// Info logs a message at InfoLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
+// DebugCtx
+/**
+ * @Description:
+ * @param ctx
+ * @param msg
+ * @param fields
+ */
+func DebugCtx(ctx context.Context, msg string, fields ...zap.Field) {
+	logOutputCtx(ctx, msg, DebugLevel, GetLogger().Debug, fields...)
+}
+
+// Info
+/**
+ * @Description:
+ * @param msg
+ * @param fields
+ */
 func Info(msg string, fields ...zap.Field) {
-	if GetLevel().Unabled(InfoLevel) {
-		return
-	}
-	GetLogger().Info(msg, fields...)
-}
-func InfoCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Unabled(InfoLevel) {
-		return
-	}
-	fs := PickRequestId(ctx, fields)
-	GetLogger().Info(msg, fs...)
+	InfoCtx(nil, msg, fields...)
 }
 
-// Warn logs a message at WarnLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
+// InfoCtx
+/**
+ * @Description:
+ * @param ctx
+ * @param msg
+ * @param fields
+ */
+func InfoCtx(ctx context.Context, msg string, fields ...zap.Field) {
+	logOutputCtx(ctx, msg, InfoLevel, GetLogger().Info, fields...)
+}
+
+// Warn
+/**
+ * @Description:
+ * @param msg
+ * @param fields
+ */
 func Warn(msg string, fields ...zap.Field) {
-	if GetLevel().Unabled(WarnLevel) {
-		return
-	}
-	GetLogger().Warn(msg, fields...)
+	WarnCtx(nil, msg, fields...)
 }
-func WarnCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Unabled(WarnLevel) {
-		return
-	}
-	fs := PickRequestId(ctx, fields)
-	GetLogger().Warn(msg, fs...)
+func WarnCtx(ctx context.Context, msg string, fields ...zap.Field) {
+	logOutputCtx(ctx, msg, WarnLevel, GetLogger().Warn, fields...)
 }
 
-// Error logs a message at ErrorLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
+// Error
+/**
+ * @Description:
+ * @param msg
+ * @param fields
+ */
 func Error(msg string, fields ...zap.Field) {
-	if GetLevel().Unabled(ErrorLevel) {
-		return
-	}
-	GetLogger().Error(msg, fields...)
-}
-func ErrorCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Unabled(ErrorLevel) {
-		return
-	}
-	fs := PickRequestId(ctx, fields)
-	GetLogger().Error(msg, fs...)
+	ErrorCtx(nil, msg, fields...)
 }
 
-// Panic logs a message at PanicLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
-//
-// The logger then panics, even if logging at PanicLevel is disabled.
+// ErrorCtx
+/**
+ * @Description:
+ * @param ctx
+ * @param msg
+ * @param fields
+ */
+func ErrorCtx(ctx context.Context, msg string, fields ...zap.Field) {
+	logOutputCtx(ctx, msg, ErrorLevel, GetLogger().Error, fields...)
+}
+
+// Panic
+/**
+ * @Description:
+ * @param msg
+ * @param fields
+ */
 func Panic(msg string, fields ...zap.Field) {
-	if GetLevel().Unabled(CriticalLevel) {
-		return
-	}
-	GetLogger().Panic(msg, fields...)
-}
-func PanicCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Unabled(CriticalLevel) {
-		return
-	}
-	fs := PickRequestId(ctx, fields)
-	GetLogger().Panic(msg, fs...)
+	PanicCtx(nil, msg, fields...)
 }
 
-// Fatal logs a message at FatalLevel. The message includes any fields passed
-// at the log site, as well as any fields accumulated on the logger.
-//
-// The logger then calls os.Exit(1), even if logging at FatalLevel is
-// disabled.
-func Fatal(msg string, fields ...zap.Field) {
-	if GetLevel().Unabled(CriticalLevel) {
-		return
-	}
-	GetLogger().Fatal(msg, fields...)
+// PanicCtx
+/**
+ * @Description:
+ * @param ctx
+ * @param msg
+ * @param fields
+ */
+func PanicCtx(ctx context.Context, msg string, fields ...zap.Field) {
+	logOutputCtx(ctx, msg, CriticalLevel, GetLogger().Panic, fields...)
 }
 
-func FatalCtx(msg string, ctx context.Context, fields ...zap.Field) {
-	if GetLevel().Unabled(CriticalLevel) {
-		return
-	}
-	fs := PickRequestId(ctx, fields)
-	GetLogger().Fatal(msg, fs...)
+// Fatal
+/**
+ * @Description:
+ * @param msg
+ * @param fields
+ */func Fatal(msg string, fields ...zap.Field) {
+	FatalCtx(nil, msg, fields...)
 }
 
-func FieldsFrmCtx(ctx context.Context, fields ...zap.Field) []zap.Field {
+// FatalCtx
+/**
+ * @Description:
+ * @param ctx
+ * @param msg
+ * @param fields
+ */
+func FatalCtx(ctx context.Context, msg string, fields ...zap.Field) {
+	logOutputCtx(ctx, msg, CriticalLevel, GetLogger().Panic, fields...)
+}
+
+// logOutputCtx
+/**
+ * @Description:
+ * @param ctx
+ * @param msg
+ * @param level
+ * @param logFunc
+ * @param fields
+ */
+func logOutputCtx(ctx context.Context, msg string, level Level, logFunc func(string, ...zap.Field), fields ...zap.Field) {
+	if GetLevel().Unabled(level) {
+		return
+	}
+	fields = append(fields, Ctx2Fields(ctx)...)
+	logFunc(msg, fields...)
+}
+
+// Ctx2Fields
+/**
+ * @Description:
+ * @param ctx
+ * @return []zap.Field
+ */
+func Ctx2Fields(ctx context.Context) []zap.Field {
+	fields := make([]zap.Field, 0)
 	if ctx != nil {
 		if v := ctx.Value(REQUEST_ID_KEY); v != nil {
 			rid := v.(string)
@@ -130,43 +169,32 @@ func FieldsFrmCtx(ctx context.Context, fields ...zap.Field) []zap.Field {
 	return fields
 }
 
-func PickRequestId(ctx context.Context, fields []zap.Field) []zap.Field {
-	if ctx != nil {
-		if v := ctx.Value(REQUEST_ID_KEY); v != nil {
-			rid := v.(string)
-			fields = append(fields, zap.String(K_SessionId, rid))
-			fields = append(fields, zap.String(K_TraceId, rid))
-		}
-		if v := ctx.Value(K_BusinessKeyword); v != nil {
-			kw := v.(string)
-			fields = append(fields, zap.String(K_BusinessKeyword, kw))
-		}
-		if v := ctx.Value(K_BusinessOperation); v != nil {
-			kw := v.(string)
-			fields = append(fields, zap.String(K_BusinessOperation, kw))
-		}
-		if v := ctx.Value(K_BusinessTitle); v != nil {
-			kw := v.(string)
-			fields = append(fields, zap.String(K_BusinessTitle, kw))
-		}
-	}
-	return fields
-}
-
-// With creates a child logger and adds structured context to it.
-// Fields added to the child don't affect the parent, and vice versa.
+// With
+/**
+ * @Description: creates a child logger and adds structured context to it. Fields added to the child don't affect the parent, and vice versa.
+ * @param fields
+ * @return *zap.Logger
+ */
 func With(fields ...zap.Field) *zap.Logger {
 	return GetLogger().WithOptions(zap.AddCallerSkip(1)).With(fields...)
 }
 
 // SetLevel alters the logging level.
+/**
+ * @Description:
+ * @param levelStr
+ */
 func SetLevel(levelStr string) {
 	l := new(Level)
 	l.Unpack(levelStr)
 	_gProps.Load().(*ZapProperties).Level = l
 }
 
-// GetLevel gets the logging level.
+// GetLevel
+/**
+ * @Description:
+ * @return *Level
+ */
 func GetLevel() *Level {
 	return _gProps.Load().(*ZapProperties).Level
 }

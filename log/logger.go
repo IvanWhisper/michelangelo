@@ -60,7 +60,7 @@ func Sync() error {
 // InitLogger initializes a zap logger.
 func InitLogger(cfg *Config, opts ...zap.Option) (*zap.Logger, *ZapProperties, error) {
 	var output zapcore.WriteSyncer
-	if len(cfg.File.Filename) > 0 {
+	if len(cfg.File.FileName) > 0 {
 		output = zapcore.AddSync(getWriter(&cfg.File))
 	} else {
 		stdOut, _, err := zap.Open([]string{"stdout"}...)
@@ -157,8 +157,8 @@ func initFileLogName(cfg *FileLogConfig) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if len(cfg.Filename) > 0 {
-		return path.Join(dir, cfg.Filename), nil
+	if len(cfg.FileName) > 0 {
+		return path.Join(dir, cfg.FileName), nil
 	} else {
 		return "app", nil
 	}

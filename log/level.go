@@ -2,7 +2,6 @@ package log
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"strings"
 
 	"go.uber.org/zap/zapcore"
@@ -60,8 +59,7 @@ func (l *Level) Unpack(str string) error {
 			return nil
 		}
 	}
-
-	return errors.New(fmt.Sprintf("invalid level '%v'", str))
+	return fmt.Errorf(fmt.Sprintf("invalid level '%v'", str))
 }
 
 func (l Level) zapLevel() zapcore.Level {
