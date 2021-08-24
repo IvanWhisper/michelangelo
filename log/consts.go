@@ -1,45 +1,47 @@
 package log
 
+type ContextLogKey string
+
 const (
-	DEBUG_REQUEST_ID = "DebugRequestId"
+	DEBUG_REQUEST_ID ContextLogKey = "DebugRequestId" // debug
 
-	REQUEST_ID_KEY = "rid"
-	REQUEST_ID     = "request-id"
+	REQUEST_ID_KEY ContextLogKey = "rid"
+	REQUEST_ID     ContextLogKey = "request-id"
 
-	K_SessionId = "sessionId"
-	K_TraceId   = "traceId"
-	K_SpanId    = "spanId"
-	K_ThreadId  = "threadId"
+	K_SessionId ContextLogKey = "sessionId"
+	K_TraceId   ContextLogKey = "traceId"
+	K_SpanId    ContextLogKey = "spanId"
+	K_ThreadId  ContextLogKey = "threadId"
 
-	K_Cluster    = "cluster"
-	K_AppName    = "appName"
-	K_ServerAddr = "serverAddr"
-	K_ServerPort = "serverPort"
-	K_Version    = "version"
+	K_Cluster    ContextLogKey = "cluster"
+	K_AppName    ContextLogKey = "appName"
+	K_ServerAddr ContextLogKey = "serverAddr"
+	K_ServerPort ContextLogKey = "serverPort"
+	K_Version    ContextLogKey = "version"
 
-	K_LogCategory = "logCategory"
+	K_LogCategory ContextLogKey = "logCategory"
 
-	K_HttpPath     = "httpPath"
-	K_HttpMethod   = "httpMethod"
-	K_Query        = "query"
-	K_ContentType  = "contentType"
-	K_StatusCode   = "statusCode"
-	K_RequestSize  = "requestSize"
-	K_HttpRequest  = "httpRequest"
-	K_HttpResponse = "httpResponse"
-	K_ClientIp     = "clientIp"
-	K_UserAgent    = "userAgent"
-	K_Errors       = "errors"
+	K_HttpPath     ContextLogKey = "httpPath"
+	K_HttpMethod   ContextLogKey = "httpMethod"
+	K_Query        ContextLogKey = "query"
+	K_ContentType  ContextLogKey = "contentType"
+	K_StatusCode   ContextLogKey = "statusCode"
+	K_RequestSize  ContextLogKey = "requestSize"
+	K_HttpRequest  ContextLogKey = "httpRequest"
+	K_HttpResponse ContextLogKey = "httpResponse"
+	K_ClientIp     ContextLogKey = "clientIp"
+	K_UserAgent    ContextLogKey = "userAgent"
+	K_Errors       ContextLogKey = "errors"
 
-	K_Message = "msg"
+	K_Message ContextLogKey = "msg"
 
-	K_BusinessKeyword   = "businessKeyword"
-	K_BusinessTitle     = "businessTitle"
-	K_BusinessOperation = "businessOperation"
+	K_BusinessKeyword   ContextLogKey = "businessKeyword"
+	K_BusinessTitle     ContextLogKey = "businessTitle"
+	K_BusinessOperation ContextLogKey = "businessOperation"
 
-	K_Datetime = "datetime"
-	K_Caller   = "caller"
+	K_Datetime ContextLogKey = "datetime"
+	K_Caller   ContextLogKey = "caller"
 
-	K_Duration = "duration"
-	K_Level    = "level"
+	K_Duration ContextLogKey = "duration"
+	K_Level    ContextLogKey = "level"
 )
