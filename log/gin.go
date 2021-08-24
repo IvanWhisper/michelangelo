@@ -30,7 +30,7 @@ func GinLogger() gin.HandlerFunc {
 		rid := c.GetHeader("X-Request-ID")
 
 		// 用户链路调试
-		if debugID := c.GetHeader(DEBUG_REQUEST_ID); debugID != "" {
+		if debugID := c.GetHeader(string(DebugRequestId)); debugID != "" {
 			rid = debugID
 		}
 
@@ -38,20 +38,20 @@ func GinLogger() gin.HandlerFunc {
 			rid = uuid.NewString()
 		}
 
-		var ridCtx = context.WithValue(c.Request.Context(), REQUEST_ID_KEY, rid) // session id
+		var ridCtx = context.WithValue(c.Request.Context(), RequestIdKey, rid) // session id
 		c.Request = c.Request.WithContext(ridCtx)
 		c.Next()
 		cost := time.Since(start)
 		GetLogger().Info(path,
-			zap.String(K_SessionId, rid),
-			zap.Int(K_StatusCode, c.Writer.Status()),
-			zap.String(K_HttpMethod, c.Request.Method),
-			zap.String(K_HttpPath, path),
-			zap.String(K_Query, query),
-			zap.String(K_ClientIp, c.ClientIP()),
-			zap.String(K_UserAgent, c.Request.UserAgent()),
-			zap.String(K_Errors, c.Errors.ByType(gin.ErrorTypePrivate).String()),
-			zap.Duration(K_Duration, cost),
+			zap.String(SessionId.ToString(), rid),
+			zap.Int(StatusCode.ToString(), c.Writer.Status()),
+			zap.String(HttpMethod.ToString(), c.Request.Method),
+			zap.String(HttpPath.ToString(), path),
+			zap.String(QueryText.ToString(), query),
+			zap.String(ClientIp.ToString(), c.ClientIP()),
+			zap.String(UserAgent.ToString(), c.Request.UserAgent()),
+			zap.String(Errors.ToString(), c.Errors.ByType(gin.ErrorTypePrivate).String()),
+			zap.Duration(Duration.ToString(), cost),
 		)
 	}
 }
@@ -81,7 +81,7 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 
 				httpRequest, _ := httputil.DumpRequest(c.Request, false)
 				if brokenPipe {
-					GetLogger().Sugar().Error(c.Request.URL.Path, zap.Any(K_Errors, err), zap.String(K_HttpRequest, string(httpRequest)))
+					GetLogger().Sugar().Error(c.Request.URL.Path, zap.Any(Errors.ToString(), err), zap.String(HttpRequest.ToString(), string(httpRequest)))
 					// If the connection is dead, we can't write a status to it.
 					c.Error(err.(error)) // nolint: error check
 					c.Abort()
@@ -89,9 +89,9 @@ func GinRecovery(stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					GetLogger().Sugar().Error("Recovery from panic", zap.Any(K_Errors, err), zap.String(K_HttpRequest, string(httpRequest)), zap.String("stack", string(debug.Stack())))
+					GetLogger().Sugar().Error("Recovery from panic", zap.Any(Errors.ToString(), err), zap.String(HttpRequest.ToString(), string(httpRequest)), zap.String("stack", string(debug.Stack())))
 				} else {
-					GetLogger().Sugar().Error("Recovery from panic", zap.Any(K_Errors, err), zap.String(K_HttpRequest, string(httpRequest)))
+					GetLogger().Sugar().Error("Recovery from panic", zap.Any(Errors.ToString(), err), zap.String(HttpRequest.ToString(), string(httpRequest)))
 				}
 				c.AbortWithStatus(http.StatusInternalServerError)
 			}

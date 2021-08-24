@@ -75,12 +75,12 @@ func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
 		sessionPart = fmt.Sprintf(" [%s]", key)
 	}
 	fields := Ctx2Fields(ctx.Ctx)
-	fields = append(fields, zap.String(K_LogCategory, "SQL"), zap.Duration(K_Duration, ctx.ExecuteTime))
+	fields = append(fields, zap.String(Category.ToString(), "SQL"), zap.Duration(Duration.ToString(), ctx.ExecuteTime))
 
 	if len(ctx.SQL) > 2048 {
-		fields = append(fields, zap.String(K_Query, ctx.SQL[0:2048]))
+		fields = append(fields, zap.String(QueryText.ToString(), ctx.SQL[0:2048]))
 	} else {
-		fields = append(fields, zap.String(K_Query, ctx.SQL))
+		fields = append(fields, zap.String(QueryText.ToString(), ctx.SQL))
 	}
 	args := make([]interface{}, 0)
 	if len(ctx.Args) < 100 {
@@ -94,7 +94,7 @@ func (l *OrmLoggerAdapter) AfterSQL(ctx xlog.LogContext) {
 	msg := fmt.Sprintf("[SQL]Part: %s Args: %v Rows %d Err %s", sessionPart, args, rows, rowErr)
 	// errors
 	if ctx.Err != nil {
-		fields = append(fields, zap.String(K_Errors, ctx.Err.Error()))
+		fields = append(fields, zap.String(Errors.ToString(), ctx.Err.Error()))
 		GetLogger().Error(msg, fields...)
 	} else {
 		GetLogger().Info(msg, fields...)

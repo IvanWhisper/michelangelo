@@ -12,7 +12,7 @@ import (
  * @param fields
  */
 func Debug(msg string, fields ...zap.Field) {
-	DebugCtx(nil, msg, fields...)
+	DebugCtx(context.TODO(), msg, fields...)
 }
 
 // DebugCtx
@@ -33,7 +33,7 @@ func DebugCtx(ctx context.Context, msg string, fields ...zap.Field) {
  * @param fields
  */
 func Info(msg string, fields ...zap.Field) {
-	InfoCtx(nil, msg, fields...)
+	InfoCtx(context.TODO(), msg, fields...)
 }
 
 // InfoCtx
@@ -54,7 +54,7 @@ func InfoCtx(ctx context.Context, msg string, fields ...zap.Field) {
  * @param fields
  */
 func Warn(msg string, fields ...zap.Field) {
-	WarnCtx(nil, msg, fields...)
+	WarnCtx(context.TODO(), msg, fields...)
 }
 func WarnCtx(ctx context.Context, msg string, fields ...zap.Field) {
 	logOutputCtx(ctx, msg, WarnLevel, GetLogger().Warn, fields...)
@@ -67,7 +67,7 @@ func WarnCtx(ctx context.Context, msg string, fields ...zap.Field) {
  * @param fields
  */
 func Error(msg string, fields ...zap.Field) {
-	ErrorCtx(nil, msg, fields...)
+	ErrorCtx(context.TODO(), msg, fields...)
 }
 
 // ErrorCtx
@@ -88,7 +88,7 @@ func ErrorCtx(ctx context.Context, msg string, fields ...zap.Field) {
  * @param fields
  */
 func Panic(msg string, fields ...zap.Field) {
-	PanicCtx(nil, msg, fields...)
+	PanicCtx(context.TODO(), msg, fields...)
 }
 
 // PanicCtx
@@ -147,23 +147,23 @@ func logOutputCtx(ctx context.Context, msg string, level Level, logFunc func(str
  */
 func Ctx2Fields(ctx context.Context) []zap.Field {
 	fields := make([]zap.Field, 0)
-	if ctx != nil {
-		if v := ctx.Value(REQUEST_ID_KEY); v != nil {
+	if ctx != nil && ctx != context.TODO() {
+		if v := ctx.Value(RequestIdKey); v != nil {
 			rid := v.(string)
-			fields = append(fields, zap.String(K_SessionId, rid))
-			fields = append(fields, zap.String(K_TraceId, rid))
+			fields = append(fields, zap.String(SessionId.ToString(), rid))
+			fields = append(fields, zap.String(TraceId.ToString(), rid))
 		}
-		if v := ctx.Value(K_BusinessKeyword); v != nil {
+		if v := ctx.Value(BusinessKeyword); v != nil {
 			kw := v.(string)
-			fields = append(fields, zap.String(K_BusinessKeyword, kw))
+			fields = append(fields, zap.String(BusinessKeyword.ToString(), kw))
 		}
-		if v := ctx.Value(K_BusinessOperation); v != nil {
+		if v := ctx.Value(BusinessOperation); v != nil {
 			kw := v.(string)
-			fields = append(fields, zap.String(K_BusinessOperation, kw))
+			fields = append(fields, zap.String(BusinessOperation.ToString(), kw))
 		}
-		if v := ctx.Value(K_BusinessTitle); v != nil {
+		if v := ctx.Value(BusinessTitle); v != nil {
 			kw := v.(string)
-			fields = append(fields, zap.String(K_BusinessTitle, kw))
+			fields = append(fields, zap.String(BusinessTitle.ToString(), kw))
 		}
 	}
 	return fields

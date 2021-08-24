@@ -74,12 +74,12 @@ func InitLogger(cfg *Config, opts ...zap.Option) (*zap.Logger, *ZapProperties, e
 
 func BuildEncoder(format string) zapcore.Encoder {
 	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        K_Datetime,
-		LevelKey:       "level",
+		TimeKey:        Datetime.ToString(),
+		LevelKey:       LevelKey.ToString(),
 		NameKey:        "logger",
-		CallerKey:      "caller",
+		CallerKey:      Caller.ToString(),
 		FunctionKey:    zapcore.OmitKey,
-		MessageKey:     "msg",
+		MessageKey:     Message.ToString(),
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
@@ -108,21 +108,21 @@ func InitLoggerWithWriteSyncer(cfg *Config, output zapcore.WriteSyncer, opts ...
 	// get level
 	def := DebugLevel
 	lv := &def
-	stdlv := &def
+	stdLevel := &def
 
-	coretree := make([]zapcore.Core, 0)
+	coreTree := make([]zapcore.Core, 0)
 
 	if cfg != nil {
 		lv := cfg.GetLevel()
-		stdlv = cfg.GetStdLevel()
+		stdLevel = cfg.GetStdLevel()
 		// build file core
-		f_encoder := BuildEncoder(cfg.Format)
-		coretree = append(coretree, zapcore.NewCore(f_encoder, output, lv.zapLevel()))
+		fileEncoder := BuildEncoder(cfg.Format)
+		coreTree = append(coreTree, zapcore.NewCore(fileEncoder, output, lv.zapLevel()))
 	}
 
-	c_encoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	coretree = append(coretree, zapcore.NewCore(c_encoder, zapcore.Lock(os.Stdout), stdlv.zapLevel()))
-	cores := zapcore.NewTee(coretree...)
+	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	coreTree = append(coreTree, zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stdout), stdLevel.zapLevel()))
+	cores := zapcore.NewTee(coreTree...)
 
 	// build log
 	lg := zap.New(cores, zap.AddCaller(), zap.AddCallerSkip(cfg.CallSkip))
