@@ -21,8 +21,8 @@ const (
 
 	Category ContextLogKey = "logCategory"
 
-	HttpPath     ContextLogKey = "httpPath"
-	HttpMethod   ContextLogKey = "httpMethod"
+	HttpPath     ContextLogKey = "httpPath"   //nolint:gosec
+	HttpMethod   ContextLogKey = "httpMethod" //nolint:gosec
 	QueryText    ContextLogKey = "query"
 	ContentType  ContextLogKey = "contentType"
 	StatusCode   ContextLogKey = "statusCode"
@@ -38,6 +38,7 @@ const (
 	BusinessKeyword   ContextLogKey = "businessKeyword"
 	BusinessTitle     ContextLogKey = "businessTitle"
 	BusinessOperation ContextLogKey = "businessOperation"
+	BusinessUserID    ContextLogKey = "businessUserID"
 
 	Datetime ContextLogKey = "datetime"
 	Caller   ContextLogKey = "caller"
