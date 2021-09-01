@@ -165,6 +165,10 @@ func Ctx2Fields(ctx context.Context) []zap.Field {
 			kw := v.(string)
 			fields = append(fields, zap.String(BusinessTitle.ToString(), kw))
 		}
+		if v := ctx.Value(BusinessUserID); v != nil {
+			kw := v.(string)
+			fields = append(fields, zap.String(BusinessUserID.ToString(), kw))
+		}
 	}
 	return fields
 }
