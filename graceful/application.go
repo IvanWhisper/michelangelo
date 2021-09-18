@@ -105,7 +105,12 @@ func (a *application) Run(args ...string) error {
 	}()
 	select {
 	case <-timeoutCtx.Done():
-		return errors.New(fmt.Sprintf("PID[%d]%s Exec %v timeOut %fs", app.Process.Pid, a.GetName(), args, a.GetTimeOut().Seconds()))
+		errMsg := fmt.Sprintf("PID[%d]%s Exec %v timeOut %fs", app.Process.Pid, a.GetName(), args, a.GetTimeOut().Seconds())
+		mlog.Info(errMsg)
+		if toErr := timeoutCtx.Err(); toErr != nil {
+			return toErr
+		}
+		return errors.New(errMsg)
 	case c := <-completedCh:
 		if c.Success {
 			return nil

@@ -5,6 +5,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type LoggerFunc func(msg string, fields ...zap.Field)
+
+type LoggerCtxFunc func(ctx context.Context, msg string, fields ...zap.Field)
+
 // Debug
 /**
  * @Description:
@@ -108,7 +112,7 @@ func PanicCtx(ctx context.Context, msg string, fields ...zap.Field) {
  * @param msg
  * @param fields
  */func Fatal(msg string, fields ...zap.Field) {
-	FatalCtx(nil, msg, fields...)
+	FatalCtx(context.TODO(), msg, fields...)
 }
 
 // FatalCtx

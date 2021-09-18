@@ -1,7 +1,9 @@
 package exception
 
 import (
+	"context"
 	"fmt"
+	"github.com/IvanWhisper/michelangelo/log"
 )
 
 type Exception interface {
@@ -49,6 +51,11 @@ func (e *exception) WithError(err error) Exception {
 }
 func (e *exception) WithMsg(msg string) Exception {
 	e.msg = msg
+	return e
+}
+
+func (e *exception) WithLogCtx(ctx context.Context) Exception {
+	log.ErrorCtx(ctx, e.Error())
 	return e
 }
 
