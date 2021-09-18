@@ -85,14 +85,19 @@ func (a *application) GetContext() context.Context {
 func (a *application) Run(args ...string) error {
 	timeoutCtx, cancel := context.WithTimeout(a.GetContext(), a.GetTimeOut())
 	defer cancel()
-	app := exec.CommandContext(timeoutCtx, a.cmd, args...)
+	app := exec.CommandContext(timeoutCtx, a.cmd, args...) //nolint:gosec
 	app.Dir = a.GetWorkPath()
 	app.Stdout = os.Stdout
 	app.Stderr = os.Stderr
 	if err := app.Start(); err != nil {
 		return err
 	}
-	defer app.Process.Kill()
+	defer func() {
+		err := app.Process.Kill()
+		if err != nil {
+			mlog.ErrorCtx(a.GetContext(), err.Error())
+		}
+	}()
 	completedCh := make(chan CompleteResult, 0)
 	go func() {
 		defer close(completedCh)
@@ -106,7 +111,7 @@ func (a *application) Run(args ...string) error {
 	select {
 	case <-timeoutCtx.Done():
 		errMsg := fmt.Sprintf("PID[%d]%s Exec %v timeOut %fs", app.Process.Pid, a.GetName(), args, a.GetTimeOut().Seconds())
-		mlog.Info(errMsg)
+		mlog.InfoCtx(a.GetContext(), errMsg)
 		if toErr := timeoutCtx.Err(); toErr != nil {
 			return toErr
 		}
