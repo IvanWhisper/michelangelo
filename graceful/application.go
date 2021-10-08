@@ -93,9 +93,11 @@ func (a *application) Run(args ...string) error {
 		return err
 	}
 	defer func() {
-		err := app.Process.Kill()
-		if err != nil {
-			mlog.ErrorCtx(a.GetContext(), err.Error())
+		if !app.ProcessState.Exited() {
+			err := app.Process.Kill()
+			if err != nil {
+				mlog.ErrorCtx(a.GetContext(), err.Error())
+			}
 		}
 	}()
 	completedCh := make(chan CompleteResult, 0)
