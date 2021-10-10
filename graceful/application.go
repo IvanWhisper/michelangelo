@@ -1,6 +1,7 @@
 package graceful
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -10,12 +11,17 @@ import (
 	"time"
 )
 
+var _ = IApplication(&application{})
+
 type IApplication interface {
 	SetName(value string)
 	GetName() string
 
 	SetCmd(value string)
 	GetCmd() string
+
+	SetPrintCh(value chan string)
+	GetPrintCh() chan string
 
 	SetWorkPath(value string)
 	GetWorkPath() string
@@ -35,6 +41,7 @@ type application struct {
 	workPath string
 	timeOut  time.Duration
 	ctx      context.Context
+	printCh  chan string
 }
 
 type CompleteResult struct {
@@ -58,11 +65,22 @@ func (a *application) GetCmd() string {
 	return a.cmd
 }
 
+func (a *application) SetPrintCh(value chan string) {
+	a.printCh = value
+}
+
+func (a *application) GetPrintCh() chan string {
+	return a.printCh
+}
+
 func (a *application) SetWorkPath(value string) {
 	a.workPath = value
 }
 
 func (a *application) GetWorkPath() string {
+	if a.workPath == "" {
+		return "./"
+	}
 	return a.workPath
 }
 
@@ -71,6 +89,9 @@ func (a *application) SetTimeOut(value time.Duration) {
 }
 
 func (a *application) GetTimeOut() time.Duration {
+	if a.timeOut.Seconds() == 0 {
+		return 10 * time.Second
+	}
 	return a.timeOut
 }
 
@@ -79,7 +100,36 @@ func (a *application) SetContext(ctx context.Context) {
 }
 
 func (a *application) GetContext() context.Context {
+	if a.ctx != nil {
+		return context.Background()
+	}
 	return a.ctx
+}
+
+func (a *application) initPrinter(app *exec.Cmd) error {
+	if a.GetPrintCh() == nil {
+		app.Stdout = os.Stdout
+		app.Stderr = os.Stderr
+	} else {
+		output, err := app.StdoutPipe()
+		app.Stderr = app.Stdout
+		if err != nil {
+			return err
+		}
+		go func() {
+			defer close(a.GetPrintCh())
+			for {
+				tmp := make([]byte, 2048)
+				_, err := output.Read(tmp)
+				index := bytes.IndexByte(tmp, 0)
+				a.GetPrintCh() <- string(tmp[0:index])
+				if err != nil {
+					break
+				}
+			}
+		}()
+	}
+	return nil
 }
 
 func (a *application) Run(args ...string) error {
@@ -87,8 +137,10 @@ func (a *application) Run(args ...string) error {
 	defer cancel()
 	app := exec.CommandContext(timeoutCtx, a.cmd, args...) //nolint:gosec
 	app.Dir = a.GetWorkPath()
-	app.Stdout = os.Stdout
-	app.Stderr = os.Stderr
+	err := a.initPrinter(app)
+	if err != nil {
+		return err
+	}
 	if err := app.Start(); err != nil {
 		return err
 	}
@@ -110,6 +162,7 @@ func (a *application) Run(args ...string) error {
 		}
 		completedCh <- CompleteResult{Success: true, Error: nil}
 	}()
+
 	select {
 	case <-timeoutCtx.Done():
 		errMsg := fmt.Sprintf("PID[%d]%s Exec %v timeOut %fs", app.Process.Pid, a.GetName(), args, a.GetTimeOut().Seconds())
