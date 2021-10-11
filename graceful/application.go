@@ -122,7 +122,10 @@ func (a *application) initPrinter(app *exec.Cmd) error {
 				tmp := make([]byte, 2048)
 				_, err := output.Read(tmp)
 				index := bytes.IndexByte(tmp, 0)
-				a.GetPrintCh() <- string(tmp[0:index])
+				if index > 0 {
+					tmp = tmp[0:index]
+				}
+				a.GetPrintCh() <- string(tmp)
 				if err != nil {
 					break
 				}
