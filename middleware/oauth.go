@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"fmt"
-	mlog "github.com/IvanWhisper/michelangelo/log"
+	mlog "github.com/IvanWhisper/michelangelo/infrastructure/log"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"

@@ -3,7 +3,7 @@ package exception
 import (
 	"context"
 	"fmt"
-	"github.com/IvanWhisper/michelangelo/log"
+	"github.com/IvanWhisper/michelangelo/infrastructure/log"
 )
 
 type Exception interface {

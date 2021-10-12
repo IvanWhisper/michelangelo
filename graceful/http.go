@@ -3,7 +3,7 @@ package graceful
 import (
 	"context"
 	"fmt"
-	mlog "github.com/IvanWhisper/michelangelo/log"
+	mlog "github.com/IvanWhisper/michelangelo/infrastructure/log"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os/signal"

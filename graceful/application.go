@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	mlog "github.com/IvanWhisper/michelangelo/log"
+	mlog "github.com/IvanWhisper/michelangelo/infrastructure/log"
 	"os"
 	"os/exec"
 	"time"
