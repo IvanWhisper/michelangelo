@@ -148,7 +148,7 @@ func (a *application) Run(args ...string) error {
 		return err
 	}
 	defer func() {
-		if !app.ProcessState.Exited() {
+		if app != nil && app.ProcessState != nil && !app.ProcessState.Exited() {
 			err := app.Process.Kill()
 			if err != nil {
 				mlog.ErrorCtx(a.GetContext(), err.Error())
